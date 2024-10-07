@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favorites List</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Favorites List</h2>
+  <table class="table table-bordered mt-3">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="favoritesTableBody">
+    </tbody>
+  </table>
+</div>
+
+<script>
+
+  function populateFavorites(favorites) {
+    const favoritesTableBody = document.getElementById('favoritesTableBody');
+    favoritesTableBody.innerHTML = '';  // Clear the table
+
+    favorites.forEach(movie => {
+      favoritesTableBody.innerHTML += `
+                    <tr>
+                        <td>${movie.title}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="removeFromFavorites('${movie.title}')">Remove from Favorites</button>
+                            <button class="btn btn-info" onclick="viewDetails('${movie.title}')">Details</button>
+                        </td>
+                    </tr>
+                `;
+    });
+  }
+
+
+  window.onload = function () {
+    fetch('/movies/favorites')
+            .then(response => response.json())
+            .then(favorites => {
+              populateFavorites(favorites);
+            });
+  };
+
+
+  function removeFromFavorites(title) {
+    fetch('/movies/favorites/remove', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `title=${encodeURIComponent(title)}`
+    })
+            .then(response => response.text())
+            .then(message => {
+              alert(message);
+              window.location.reload();
+            });
+  }
+
+  function viewDetails(title) {
+    window.location.href = `movie-details.html?title=${encodeURIComponent(title)}`;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Movie Details</h2>
+  <div id="movieDetails"></div>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const title = urlParams.get('title');
+
+  fetch(`/movies/details?title=${encodeURIComponent(title)}`)
+          .then(response => response.json())
+          .then(movie => {
+            const movieDetails = document.getElementById('movieDetails');
+            movieDetails.innerHTML = `
+                    <p><strong>Title:</strong> ${movie.title}</p>
+                    <p><strong>Cast:</strong> ${movie.cast.join(', ')}</p>
+                    <p><strong>Category:</strong> ${movie.category}</p>
+                    <p><strong>Release Date:</strong> ${movie.releaseDate}</p>
+                    <p><strong>Budget:</strong> ${movie.budget}</p>
+                `;
+          });
+</script>
+</body>
+</html>

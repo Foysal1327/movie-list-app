@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Movie List</h2>
+        <a href="/favorites.html" class="btn btn-success">View My Favorites</a>
+    </div>
+
+    <div class="input-group mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search movies by title, cast, or category">
+        <div class="input-group-append">
+            <button class="btn btn-primary" id="searchButton">Search</button>
+        </div>
+    </div>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Cast</th>
+            <th>Category</th>
+            <th>Release Date</th>
+            <th>Budget</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="movieTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function populateMovies(movies) {
+        const movieTableBody = document.getElementById('movieTableBody');
+        movieTableBody.innerHTML = '';  // Clear the table
+
+        movies.forEach(movie => {
+            movieTableBody.innerHTML += `
+                    <tr>
+                        <td>${movie.title}</td>
+                        <td>${movie.cast.join(', ')}</td>
+                        <td>${movie.category}</td>
+                        <td>${movie.releaseDate}</td>
+                        <td>${movie.budget}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="addToFavorites('${movie.title}')">Add to Favorites</button>
+                            <button class="btn btn-secondary" onclick="viewDetails('${movie.title}')">Details</button>
+                        </td>
+                    </tr>
+                `;
+        });
+    }
+
+    window.onload = function () {
+        fetch('/movies')
+            .then(response => response.json())
+            .then(movies => {
+                populateMovies(movies);
+            });
+    };
+
+    document.getElementById('searchButton').addEventListener('click', function () {
+        const query = document.getElementById('searchInput').value;
+        fetch(`/movies/search?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(movies => {
+                populateMovies(movies);
+            });
+    });
+
+
+    function addToFavorites(title) {
+        fetch('/movies/favorites/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `title=${encodeURIComponent(title)}`
+        })
+            .then(response => response.text())
+            .then(message => {
+                alert(message);
+                // window.location.href = '/favorites.html';
+            });
+    }
+
+    function viewDetails(title) {
+        window.location.href = `movie-details.html?title=${encodeURIComponent(title)}`;
+    }
+</script>
+</body>
+</html>
